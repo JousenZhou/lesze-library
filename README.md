@@ -35,5 +35,5 @@ yarn styleguide
 
 ### 组件库文档
 
-地址演示：
+地址演示：https://jousenzhou.github.io/lesze-library/styleguide/index.html
 
