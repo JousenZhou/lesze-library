@@ -25,23 +25,51 @@ module.exports = {
                 use: ['vue-style-loader', 'css-loader', 'sass-loader?indentedSyntax']
             },
             {
-                test: /\.vue$/,
-                loader: 'vue-loader',
-                options: {
-                    loaders: {
-                        // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
-                        // the "scss" and "sass" values for the lang attribute to the right configs here.
-                        // other preprocessors should work out of the box, no loader config like this necessary.
-                        scss: ['vue-style-loader', 'css-loader', 'sass-loader'],
-                        sass: ['vue-style-loader', 'css-loader', 'sass-loader?indentedSyntax']
+                test: /\.md$/,
+                exclude: /(node_modules|bower_components)/,
+                use: [
+                    {
+                        loader: 'vue-loader', // 这里的使用的最新的 v15 版本
+                        options: {
+                            compilerOptions: {
+                                preserveWhitespace: false
+                            }
+                        }
                     }
-                    // other vue-loader options go here
-                }
+                ]
             },
             {
-                test: /\.js$/,
+                test: /\.vue$/,
+                use: [
+                    {
+                        loader: 'vue-loader',
+                        options: {
+                            loaders: {
+                                // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
+                                // the "scss" and "sass" values for the lang attribute to the right configs here.
+                                // other preprocessors should work out of the box, no loader config like this necessary.
+                                scss: ['vue-style-loader', 'css-loader', 'sass-loader'],
+                                sass: ['vue-style-loader', 'css-loader', 'sass-loader?indentedSyntax']
+                            }
+                            // other vue-loader options go here
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.(jsx|js)$/,
                 loader: 'babel-loader',
-                exclude: /node_modules/
+                exclude: /node_modules/,
+                options: (() => {
+                    return {
+                        presets: ['@vue/cli-plugin-babel/preset'],
+                        plugins: [
+                            '@babel/plugin-transform-runtime',
+                            '@babel/plugin-transform-regenerator',
+                            ['@babel/plugin-proposal-decorators', { legacy: true }]
+                        ]
+                    };
+                })()
             },
             {
                 test: /\.svg$/,
@@ -81,24 +109,19 @@ module.exports = {
     },
     devtool: '#eval-source-map'
 };
-
 if (process.env.NODE_ENV === 'production') {
-    module.exports.devtool = '#source-map';
-    // http://vue-loader.vuejs.org/en/workflow/production.html
+    // module.exports.devtool = '#source-map';
     module.exports.plugins = (module.exports.plugins || []).concat([
         new webpack.DefinePlugin({
             'process.env': {
                 NODE_ENV: '"production"'
             }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            sourceMap: true,
-            compress: {
-                warnings: false
-            }
-        }),
-        new webpack.LoaderOptionsPlugin({
-            minimize: true
         })
+        // new webpack.LoaderOptionsPlugin({
+        //     minimize: true
+        // })
     ]);
+    // module.exports.optimization = {
+    //     minimizer: [new UglifyJsPlugin()]
+    // };
 }
